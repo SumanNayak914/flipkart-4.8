@@ -1,0 +1,31 @@
+// src/component/accountComponent/FooterButtons.jsx
+import { motion } from "framer-motion";
+import { FiLogOut, FiSettings } from "react-icons/fi";
+
+export default function FooterButtons() {
+  return (
+    <motion.div
+      className="bg-white rounded-lg p-4 mb-16 shadow-sm"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="flex justify-between">
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2 text-sm text-red-600 font-medium px-4 py-2 border border-red-200 rounded-md w-[48%] justify-center"
+        >
+          <FiLogOut className="text-lg" />
+          Logout
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2 text-sm text-gray-700 font-medium px-4 py-2 border border-gray-200 rounded-md w-[48%] justify-center"
+        >
+          <FiSettings className="text-lg" />
+          Settings
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
