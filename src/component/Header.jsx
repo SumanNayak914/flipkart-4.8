@@ -10,27 +10,29 @@ export default function MobileNavBar() {
     // GSAP and ScrollTrigger ko load karna
     const loadGSAP = async () => {
       // GSAP load karna
-      const gsapScript = document.createElement('script');
-      gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+      const gsapScript = document.createElement("script");
+      gsapScript.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
       document.head.appendChild(gsapScript);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         gsapScript.onload = resolve;
       });
 
       // ScrollTrigger load karna
-      const scrollTriggerScript = document.createElement('script');
-      scrollTriggerScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
+      const scrollTriggerScript = document.createElement("script");
+      scrollTriggerScript.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js";
       document.head.appendChild(scrollTriggerScript);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         scrollTriggerScript.onload = resolve;
       });
 
       // GSAP animations setup
       const gsap = window.gsap;
       const ScrollTrigger = window.ScrollTrigger;
-      
+
       gsap.registerPlugin(ScrollTrigger);
 
       // Service Icons Animation - fade out and move up
@@ -44,7 +46,7 @@ export default function MobileNavBar() {
           start: "top top",
           end: "100px top",
           scrub: true,
-        }
+        },
       });
 
       // Location Bar Animation - fade out and move up
@@ -58,7 +60,7 @@ export default function MobileNavBar() {
           start: "50px top",
           end: "150px top",
           scrub: true,
-        }
+        },
       });
 
       // Search Bar Pin - Sticky behavior with scrub
@@ -68,7 +70,7 @@ export default function MobileNavBar() {
         end: "max",
         pin: true,
         pinSpacing: false,
-        scrub: true
+        scrub: true,
       });
 
       // Search Bar Background Color Animation with scrub
@@ -80,8 +82,8 @@ export default function MobileNavBar() {
           trigger: searchContainerRef.current,
           start: "top 0px",
           end: "50px top",
-          scrub: true
-        }
+          scrub: true,
+        },
       });
     };
 
@@ -90,7 +92,7 @@ export default function MobileNavBar() {
     // Cleanup function
     return () => {
       if (window.ScrollTrigger) {
-        window.ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        window.ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       }
     };
   }, []);
@@ -104,9 +106,8 @@ export default function MobileNavBar() {
           ref={headerRef}
           className="w-full bg-gradient-to-b from-orange-400 to-orange-200 pt-4 pb-0 relative"
         >
-          
           {/* Service Icons Grid */}
-          <div 
+          <div
             ref={serviceIconsRef}
             className="grid grid-cols-4 gap-4 px-4 mb-4"
           >
@@ -144,7 +145,12 @@ export default function MobileNavBar() {
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 bg-white rounded-2xl flex flex-col items-center justify-center shadow-sm">
                 <div className="text-2xl mb-1">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#4F46E5">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="#4F46E5"
+                  >
                     <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
                   </svg>
                 </div>
@@ -158,7 +164,12 @@ export default function MobileNavBar() {
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 bg-white rounded-2xl flex flex-col items-center justify-center shadow-sm">
                 <div className="text-2xl mb-1">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#F59E0B">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="#F59E0B"
+                  >
                     <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
                   </svg>
                 </div>
@@ -170,7 +181,7 @@ export default function MobileNavBar() {
           </div>
 
           {/* Location Bar - removed bottom margin */}
-          <div 
+          <div
             ref={locationRef}
             className="flex items-center justify-between px-4 py-1"
           >
@@ -195,28 +206,37 @@ export default function MobileNavBar() {
         </div>
 
         {/* Search Container - No gap, thicker background initially */}
-        <div 
+        <div
           ref={searchContainerRef}
           className="w-full px-4 py-1 bg-orange-200 z-50"
-          style={{ backgroundColor: 'rgba(254, 215, 170, 1)' }}
+          style={{ backgroundColor: "rgba(254, 215, 170, 1)" }}
         >
           <div className="flex items-center space-x-3">
             {/* Search Bar */}
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex-1">
               <div className="flex items-center px-4 py-3">
                 <div className="w-5 h-5 mr-3">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#6B7280">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="#6B7280"
+                  >
                     <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                   </svg>
                 </div>
                 <input
                   type="text"
-                  placeholder="laptops"
+                  placeholder="search ..."
                   className="flex-1 text-gray-700 text-base outline-none"
-                  defaultValue="laptops"
                 />
-                <div className="w-6 h-6 ml-3">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#6B7280">
+                <div className="w-6 h-6 ml-3 block">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="#6B7280"
+                  >
                     <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-1.8c1.77 0 3.2-1.43 3.2-3.2 0-1.77-1.43-3.2-3.2-3.2S8.8 10.23 8.8 12c0 1.77 1.43 3.2 3.2 3.2z" />
                   </svg>
                 </div>
@@ -234,7 +254,6 @@ export default function MobileNavBar() {
           </div>
         </div>
       </div>
-      
     </>
   );
 }
