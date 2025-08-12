@@ -25,7 +25,6 @@ const Account = () => {
     <EarnWithFlipkart />
     <CustomerSupport />
     <FooterButtons />
-    
     </div>;
 };
 

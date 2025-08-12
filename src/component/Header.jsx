@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-
 export default function MobileNavBar() {
   const headerRef = useRef(null);
   const serviceIconsRef = useRef(null);
@@ -191,7 +190,7 @@ export default function MobileNavBar() {
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                 </svg>
               </div>
-              <span className="text-black text-sm flex-1 font-medium">
+              <span className="text-black text-sm flex-1 font-medium text-wrap">
                 Khamara,mahupadara, Sheragada, She...
               </span>
               <span className="text-black text-lg ml-2">›</span>
@@ -200,7 +199,7 @@ export default function MobileNavBar() {
               <div className="w-4 h-4 bg-yellow-600 rounded-full flex items-center justify-center mr-1">
                 <span className="text-white text-xs font-bold">⚡</span>
               </div>
-              <span className="text-black text-sm font-bold">0</span>
+              <span className="text-black text-sm font-bold">999</span>
             </div>
           </div>
         </div>
@@ -215,7 +214,13 @@ export default function MobileNavBar() {
             {/* Search Bar */}
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex-1">
               <div className="flex items-center px-4 py-3">
-                <div className="w-5 h-5 mr-3">
+                <input
+                  type="text"
+                  placeholder="search ..."
+                  className="flex-1 min-w-0 text-gray-700 text-base outline-none"
+                />
+
+                <div className="w-5 h-5 flex-shrink-0">
                   <svg
                     width="20"
                     height="20"
@@ -223,21 +228,6 @@ export default function MobileNavBar() {
                     fill="#6B7280"
                   >
                     <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  placeholder="search ..."
-                  className="flex-1 text-gray-700 text-base outline-none"
-                />
-                <div className="w-6 h-6 ml-3 block">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="#6B7280"
-                  >
-                    <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-1.8c1.77 0 3.2-1.43 3.2-3.2 0-1.77-1.43-3.2-3.2-3.2S8.8 10.23 8.8 12c0 1.77 1.43 3.2 3.2 3.2z" />
                   </svg>
                 </div>
               </div>

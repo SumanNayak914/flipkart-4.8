@@ -1,6 +1,6 @@
 // src/pages/Cart.jsx
 
-import  cartItems  from "../utils/cartItems.js";
+import cartItems from "../utils/cartItems.js";
 import { useState } from "react";
 
 export default function Cart() {
@@ -11,7 +11,7 @@ export default function Cart() {
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center mt-20">
           <img
-            src="https://cdn.flipkart.com/empty-cart-image.png" // Replace with your local image
+            src="https://cdn.flipkart.com/empty-cart-image.png"
             alt="Empty cart"
             className="w-48"
           />
@@ -36,17 +36,27 @@ export default function Cart() {
                 <p className="text-sm text-gray-600">Seller: {item.seller}</p>
 
                 <div className="flex items-center mt-2 space-x-2">
-                  <span className="text-xl font-bold text-black">₹{item.discountedPrice}</span>
-                  <span className="line-through text-gray-500 text-sm">₹{item.price}</span>
-                  <span className="text-green-600 text-sm">{item.discount}</span>
+                  <span className="text-xl font-bold text-black">
+                    ₹{item.discountedPrice}
+                  </span>
+                  <span className="line-through text-gray-500 text-sm">
+                    ₹{item.price}
+                  </span>
+                  <span className="text-green-600 text-sm">
+                    {item.discount}
+                  </span>
                 </div>
 
                 <div className="mt-4 flex items-center gap-2">
                   <button className="px-2 py-1 border rounded">-</button>
                   <span>1</span>
                   <button className="px-2 py-1 border rounded">+</button>
-                  <button className="ml-4 text-blue-600 font-medium">SAVE FOR LATER</button>
-                  <button className="ml-4 text-blue-600 font-medium">REMOVE</button>
+                  <button className="ml-4 text-blue-600 font-medium">
+                    SAVE FOR LATER
+                  </button>
+                  <button className="ml-4 text-blue-600 font-medium">
+                    REMOVE
+                  </button>
                 </div>
               </div>
             </div>

@@ -6,7 +6,8 @@ import Footer from "./component/Footer.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Products from "./pages/Products.jsx";
 import Cart from "./pages/Cart.jsx";
-import Account from "./pages/account.jsx";
+import Account from "./pages/Account.jsx";
+
 const App = () => {
   const loc = useLocation();
 
