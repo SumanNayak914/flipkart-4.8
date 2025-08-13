@@ -9,6 +9,7 @@ import Cart from "./pages/Cart.jsx";
 import Account from "./pages/Account.jsx";
 import Admin from "./pages/Admin.jsx";
 import UserLogin from "./pages/UserLogin.jsx";
+import UserRegister from "./pages/UserRegister.jsx";
 
 
 const App = () => {
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/account" element={<Account />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/userLogin" element={<UserLogin />} />
+         <Route path="/userRegister" element={<UserRegister />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

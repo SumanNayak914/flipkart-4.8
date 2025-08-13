@@ -75,19 +75,16 @@ export default function UserLogin() {
           </button>
         </form>
 
-        {/* Social Login */}
-        <div className="flex items-center my-6 w-full max-w-sm">
-          <hr className="flex-grow border-gray-300" />
-          <span className="mx-2 text-gray-500">Or Login With</span>
-          <hr className="flex-grow border-gray-300" />
-        </div>
-
+     
         {/* Signup */}
         <p className="mt-6 text-gray-500">
           Don’t have an account?{" "}
-          <a href="#" className="text-blue-500 font-semibold hover:underline">
+          <Link
+            to="/userRegister"
+            className="text-blue-500 font-semibold hover:underline"
+          >
             Signup
-          </a>
+          </Link>
         </p>
         <Link to="/" className="flex font-semibold  text-gray-500 gap-2">
           <span>
