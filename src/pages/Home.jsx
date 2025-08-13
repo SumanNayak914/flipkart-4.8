@@ -8,7 +8,7 @@ const Home = () => {
      <CategoryNavigation/>
     <Slider />
     <Products/>
-   
+  
     </div>;
 };
 
