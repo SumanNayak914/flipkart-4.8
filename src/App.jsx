@@ -7,6 +7,7 @@ import NotFound from "./pages/NotFound.jsx";
 import Products from "./pages/Products.jsx";
 import Cart from "./pages/Cart.jsx";
 import Account from "./pages/Account.jsx";
+import Admin from "./pages/Admin.jsx";
 
 const App = () => {
   const loc = useLocation();
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/" element={<Home />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
