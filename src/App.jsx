@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Header from "./component/Header.jsx";
 import Footer from "./component/Footer.jsx";
@@ -10,28 +10,44 @@ import Account from "./pages/Account.jsx";
 import Admin from "./pages/Admin.jsx";
 import UserLogin from "./pages/UserLogin.jsx";
 import UserRegister from "./pages/UserRegister.jsx";
-
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   const loc = useLocation();
 
-  return (
-    <>
-      {loc.pathname == "/" && <Header />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/userLogin" element={<UserLogin />} />
-         <Route path="/userRegister" element={<UserRegister />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Footer />
-    </>
-  );
+  // let jsonString = localStorage.getItem("user");
+  // let user = JSON.parse(jsonString);
+
+  // const navigate = useNavigate();
+
+  // console.log(user );
+
+  // if (user?.email == "sumankumarnayak802@gmail.com")
+  // {
+  //   navigate('/admin')
+  // } 
+  // if (user.email == null)
+  // {
+  //   navigate('/')
+  // } 
+    return (
+      <>
+        {loc.pathname == "/" && <Header />}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/userLogin" element={<UserLogin />} />
+          <Route path="/userRegister" element={<UserRegister />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <ToastContainer position="bottom-right" theme="dark" />
+        <Footer />
+      </>
+    );
 };
 
 export default App;
