@@ -6,7 +6,7 @@ const languages = ["Hindi", "Tamil", "Telugu", "Kannada", "Bengali", "Marathi"];
 export default function LanguageSelector() {
   return (
     <motion.div
-      className="bg-white rounded-lg p-4 mb-4 shadow-sm"
+      className="bg-white rounded-lg p-4 mb-2 shadow-sm"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}

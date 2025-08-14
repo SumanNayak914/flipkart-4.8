@@ -191,7 +191,7 @@ export default function MobileNavBar() {
                 </svg>
               </div>
               <span className="text-black text-sm flex-1 font-medium text-wrap">
-                Khamara,mahupadara, Sheragada, She...
+                behmpur, She...
               </span>
               <span className="text-black text-lg ml-2">›</span>
             </div>

@@ -19,7 +19,7 @@ const financeOptions = [
 export default function FinanceOptions() {
   return (
     <motion.div
-      className="bg-white rounded-lg p-4 mb-4 shadow-sm mt-2"
+      className="bg-white rounded-lg p-4 mb-2 shadow-sm mt-2"
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}

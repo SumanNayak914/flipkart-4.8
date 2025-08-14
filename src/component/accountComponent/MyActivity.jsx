@@ -11,7 +11,7 @@ const activities = [
 export default function MyActivity() {
   return (
     <motion.div
-      className="bg-white rounded-lg p-4 mb-4 shadow-sm"
+      className="bg-white rounded-lg p-4 mb-2 shadow-sm"
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
