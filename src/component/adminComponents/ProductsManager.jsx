@@ -490,14 +490,16 @@ export default function ProductsManager() {
               </label>
 
               <div
-                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition
                 ${imagePreviews.length ? "border-blue-300" : "border-gray-300 hover:border-blue-400"}`}
-                onClick={() => document.getElementById("fileInputMain").click()}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
               >
                 {imagePreviews.length === 0 ? (
-                  <>
+                  <div 
+                    className="cursor-pointer"
+                    onClick={() => document.getElementById("fileInputMain").click()}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -518,7 +520,7 @@ export default function ProductsManager() {
                     <p className="text-xs text-gray-500">
                       Drag and drop files here
                     </p>
-                  </>
+                  </div>
                 ) : (
                   <div className="flex flex-wrap gap-3 justify-center">
                     {imagePreviews.map((src, i) => (
@@ -735,7 +737,7 @@ export default function ProductsManager() {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0  bg-opacity-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0  flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform border-2 border-gray-200">
               <div className="p-6">
                 <div className="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-full mb-4">

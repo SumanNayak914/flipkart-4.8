@@ -4,7 +4,7 @@ import Home from "./pages/Home.jsx";
 import Header from "./component/Header.jsx";
 import Footer from "./component/Footer.jsx";
 import NotFound from "./pages/NotFound.jsx";
-import Products from "./pages/Products.jsx";
+import Product from "./pages/Product.jsx";
 import Cart from "./pages/Cart.jsx";
 import Account from "./pages/Account.jsx";
 import Admin from "./pages/Admin.jsx";
@@ -35,7 +35,7 @@ const App = () => {
         {loc.pathname == "/" && <Header />}
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
+          <Route path="/product" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/" element={<Home />} />
           <Route path="/account" element={<Account />} />
