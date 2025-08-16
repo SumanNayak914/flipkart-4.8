@@ -11,6 +11,7 @@ import Admin from "./pages/Admin.jsx";
 import UserLogin from "./pages/UserLogin.jsx";
 import UserRegister from "./pages/UserRegister.jsx";
 import { ToastContainer } from "react-toastify";
+import FlipkartProductPage from "./component/product/FlipkartProductPage.jsx";
 
 const App = () => {
   const loc = useLocation();
@@ -45,7 +46,8 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ToastContainer position="bottom-right" theme="dark" />
-        <Footer />
+        {!loc.pathname == "/product" && <Footer /> }
+        
       </>
     );
 };

@@ -1,10 +1,18 @@
 import React from 'react'
+import Nav from '../component/product/Nav'
+import FlipkartProductPage from '../component/product/FlipkartProductPage';
+import BottomNavBar from "../component/product/BottomNavBar";
+import FlipStyleCatalog from '../component/product/FlipStyleCatalog';
 
 const Product = () => {
   return (
-    <div>
-      Products
-    </div>
+   <>
+  <Nav/>
+  <FlipkartProductPage/>
+   <FlipStyleCatalog/>
+    <BottomNavBar />
+   
+   </>
   )
 }
 
