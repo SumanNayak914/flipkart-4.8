@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Star, Shield, Truck, Calendar, CreditCard, Award, ChevronRight, Info } from 'lucide-react';
 
-export default function FlipkartProductPage() {
+export default function FlipkartProductPage({product}) {
+  const [user, setUser] = useState(localStorage.getItem("user"));
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser)); // JSON string ko object me convert
+    }
+  }, []);
+
   return (
     <div className="bg-white min-h-fit font-sans text-sm max-w-md mx-auto">
       {/* Header */}
       <div className="p-3 sm:p-4"> 
         {/* Brand and Product */}
         <div className="mb-3">
-          <div className="text-gray-900 font-semibold text-lg mb-1">OPPO</div>
+          <div className="text-gray-900 font-semibold text-lg mb-1">{product.title}</div>
           <div className="text-gray-800 text-base leading-tight">
-            F27 Pro+ (Midnight Navy, 256 GB) (8 GB RAM)
+            {product.description}
           </div>
         </div>
         
@@ -51,8 +59,7 @@ export default function FlipkartProductPage() {
             </svg>
             <span className="text-green-600 text-sm font-medium">48%</span>
           </div>
-          <span className="text-gray-400 line-through text-base">₹34,999</span>
-          <span className="text-black text-2xl font-bold">₹17,999</span>
+          <span className="text-black text-2xl font-bold">{product.price}</span>
         </div>
         
         {/* Additional Costs */}
@@ -83,7 +90,7 @@ export default function FlipkartProductPage() {
         {/* EMI */}
         <div className="mb-6">
           <span className="text-gray-800 text-sm">EMI from </span>
-          <span className="text-black font-semibold text-sm">₹869/month. </span>
+          <span className="text-black font-semibold text-sm"> {12}₹/month. </span>
           <span className="text-blue-600 font-medium text-sm underline">View Plans</span>
         </div>
         
@@ -92,13 +99,13 @@ export default function FlipkartProductPage() {
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1 mb-1">
-                <span className="text-gray-800 text-sm">Deliver to:</span>
-                <span className="text-black font-medium text-sm">Alok Ku...</span>
-                <span className="text-gray-600 text-sm">, 751012</span>
+                <span className="text-gray-800 text-sm">Deliver to: </span>
+                <span className="text-black font-medium text-sm">{user?.name}</span>
+                <span className="text-gray-600 text-sm">{384795}</span>
                 <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">HOME</span>
               </div>
               <div className="text-gray-600 text-sm truncate">
-                402, SUPRIT VILLA, Nuasahi, Nayapa...
+               {user?.adress}
               </div>
             </div>
             <button className="border border-gray-300 px-3 py-1.5 rounded text-blue-600 font-medium text-sm ml-2 whitespace-nowrap">

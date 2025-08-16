@@ -1,27 +1,12 @@
 import React, { useState } from "react";
 import { ArrowLeft, Heart, Share2 } from "lucide-react";
 
-const ProductPage = () => {
+const ProductPage = ({product}) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
 
   const handleBack = () => {
     window.location.href = "/";
-  };
-
-  // Sample product data
-  const product = {
-    title: "Premium Wireless Headphones",
-    price: "₹12,999",
-    originalPrice: "₹15,999",
-    discount: "19% off",
-    images: [
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=500&h=500&fit=crop",
-    ],
   };
 
   return (

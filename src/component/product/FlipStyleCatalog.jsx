@@ -208,9 +208,9 @@ function Divider() {
 
 export default function FlipStyleCatalog() {
   return (
-    <main className="mx-auto w-full max-w-screen-sm bg-gray-50 text-gray-900 min-h-screen">
+    <div className="mx-auto w-full max-w-screen-sm bg-gray-50 text-gray-900 min-h-screen">
       {/* Custom CSS for scrollbar hiding and line clamping */}
-      <style jsx>{`
+      <style>{`
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
@@ -284,6 +284,6 @@ export default function FlipStyleCatalog() {
           ))}
         </div>
       </nav>
-    </main>
+    </div>
   );
 }
