@@ -1,35 +1,138 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 
 export default function ProductsManager() {
-  // products + id counter (delete ke baad bhi unique id rahe)
+  // products + id counter
   const [products, setProducts] = useState([]);
-  const [nextId, setNextId] = useState(1);
-
+  
   // UI state
   const [mode, setMode] = useState("add"); // "add" | "edit"
   const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+  
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteProductId, setDeleteProductId] = useState(null);
+  const [deleteProductTitle, setDeleteProductTitle] = useState('');
+
+  // Categories options (matching your API)
+  const categories = [
+    "Fashion",
+    "Electronics",
+    "Home & Garden",
+    "Sports & Outdoors",
+    "Health & Beauty",
+    "Books & Media",
+    "Toys & Games",
+    "Food & Beverages",
+    "Automotive",
+    "Office Supplies"
+  ];
 
   // form state
   const emptyForm = useMemo(
     () => ({
       title: "",
+      price: "",
       description: "",
-      discount: "",
-      rating: "",
-      review: "",
+      category: "",
     }),
     []
   );
   const [formData, setFormData] = useState(emptyForm);
-  const [images, setImages] = useState([]); // array of objectURLs (strings)
+  const [imageFiles, setImageFiles] = useState([]); // actual File objects
+  const [imagePreviews, setImagePreviews] = useState([]); // preview URLs
+
+  // Get user data from localStorage (you might need to adjust this based on your auth implementation)
+  const getUserData = () => {
+    try {
+      const userData = localStorage.getItem('user');
+      console.log('User data from localStorage:', userData);
+      return userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
+    }
+  };
+
+  // ---------- API Functions ----------
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setMessage({ type: '', text: '' });
+      
+      console.log('Fetching products...');
+      
+      const userData = getUserData();
+      if (!userData) {
+        console.error('No user data found');
+        setMessage({ type: 'error', text: 'Please login first' });
+        setLoading(false);
+        return;
+      }
+
+      console.log('Making API request to fetch products...');
+      
+      const response = await fetch('http://localhost/ecom-backend/products/get-all-products.php', {
+        method: 'GET',
+        headers: {
+          'Authorization': JSON.stringify(userData),
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('API Response status:', response.status);
+
+      if (!response.ok) {
+        let errorMessage = 'Failed to fetch products';
+        try {
+          const error = await response.json();
+          errorMessage = error.message || errorMessage;
+        } catch (e) {
+          console.error('Error parsing error response:', e);
+        }
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      console.log('API Response:', result);
+      
+      if (result.status === 200 && result.data) {
+        setProducts(result.data);
+        setMessage({ type: 'success', text: `${result.data.length} products loaded successfully` });
+      } else {
+        setProducts([]);
+        setMessage({ type: 'info', text: 'No products found' });
+      }
+    } catch (error) {
+      console.error('Fetch products error:', error);
+      setMessage({ type: 'error', text: error.message });
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load products on component mount
+  useEffect(() => {
+    console.log('Component mounted, fetching products...');
+    fetchProducts();
+  }, []);
 
   // ---------- Helpers ----------
   const resetForm = () => {
     setFormData(emptyForm);
-    images.forEach((u) => URL.revokeObjectURL(u));
-    setImages([]);
+    // Revoke preview URLs
+    imagePreviews.forEach(url => {
+      if (url && url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+    setImageFiles([]);
+    setImagePreviews([]);
     setMode("add");
     setEditingId(null);
+    setMessage({ type: '', text: '' });
   };
 
   const handleChange = (e) => {
@@ -40,10 +143,15 @@ export default function ProductsManager() {
   const addFiles = (fileList) => {
     const incoming = Array.from(fileList || []);
     if (!incoming.length) return;
-    const availableSlots = Math.max(0, 5 - images.length);
+    
+    const availableSlots = Math.max(0, 5 - imageFiles.length);
     const selected = incoming.slice(0, availableSlots);
-    const newUrls = selected.map((f) => URL.createObjectURL(f));
-    setImages((prev) => [...prev, ...newUrls]);
+    
+    // Create preview URLs
+    const newPreviews = selected.map(file => URL.createObjectURL(file));
+    
+    setImageFiles(prev => [...prev, ...selected]);
+    setImagePreviews(prev => [...prev, ...newPreviews]);
   };
 
   const handleFileInput = (e) => addFiles(e.target.files);
@@ -54,24 +162,88 @@ export default function ProductsManager() {
   const handleDragOver = (e) => e.preventDefault();
 
   const removeImageAt = (idx) => {
-    setImages((prev) => {
-      const u = prev[idx];
-      if (u) URL.revokeObjectURL(u);
-      return prev.filter((_, i) => i !== idx);
-    });
+    // Revoke preview URL
+    if (imagePreviews[idx] && imagePreviews[idx].startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreviews[idx]);
+    }
+    
+    setImageFiles(prev => prev.filter((_, i) => i !== idx));
+    setImagePreviews(prev => prev.filter((_, i) => i !== idx));
   };
 
   // ---------- CRUD ----------
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
-    const product = {
-      id: nextId,
-      ...formData,
-      images: [...images],
-    };
-    setProducts((p) => [product, ...p]);
-    setNextId((n) => n + 1);
-    resetForm();
+    
+    if (!formData.title || !formData.price || !formData.category) {
+      setMessage({ type: 'error', text: 'Title, Price, and Category are required.' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setMessage({ type: '', text: '' });
+
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('category', formData.category);
+
+      // Add images (up to 5)
+      for (let i = 0; i < 5; i++) {
+        if (imageFiles[i]) {
+          formDataToSend.append(`image${i + 1}`, imageFiles[i]);
+        }
+      }
+
+      const userData = getUserData();
+      if (!userData) {
+        throw new Error('User not logged in');
+      }
+
+      const response = await fetch('http://localhost/ecom-backend/products/post-product.php', {
+        method: 'POST',
+        headers: {
+          'Authorization': JSON.stringify(userData),
+        },
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create product');
+      }
+
+      const result = await response.json();
+      
+      // Convert the response format to match get-all format
+      const newProduct = {
+        id: result.data.id,
+        title: result.data.title,
+        description: result.data.description,
+        price: result.data.price,
+        category: result.data.category,
+        image1: result.data.images?.[0] || null,
+        image2: result.data.images?.[1] || null,
+        image3: result.data.images?.[2] || null,
+        image4: result.data.images?.[3] || null,
+        image5: result.data.images?.[4] || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      // Add new product to list
+      setProducts(prev => [newProduct, ...prev]);
+      setMessage({ type: 'success', text: result.message || 'Product created successfully!' });
+      resetForm();
+
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const startEdit = (product) => {
@@ -79,31 +251,165 @@ export default function ProductsManager() {
     setEditingId(product.id);
     setFormData({
       title: product.title,
+      price: product.price,
       description: product.description,
-      discount: product.discount,
-      rating: product.rating,
-      review: product.review,
+      category: product.category,
     });
-    setImages(product.images ? [...product.images] : []);
-    // upar lane ke liye scroll
+    
+    // Handle existing images from API response
+    const existingPreviews = [];
+    
+    // Check each image field (image1, image2, etc.)
+    for (let i = 1; i <= 5; i++) {
+      if (product[`image${i}`]) {
+        existingPreviews.push(product[`image${i}`]);
+      }
+    }
+    
+    setImageFiles([]); // Reset file objects for edit mode
+    setImagePreviews(existingPreviews);
+    
+    // Scroll to top
     try {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {}
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    setProducts((list) =>
-      list.map((p) =>
-        p.id === editingId ? { ...p, ...formData, images: [...images] } : p
-      )
-    );
-    resetForm();
+    
+    if (!formData.title || !formData.price || !formData.category) {
+      setMessage({ type: 'error', text: 'Title, Price, and Category are required.' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setMessage({ type: '', text: '' });
+
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      
+      // Add the product ID as form data (as expected by your PHP API)
+      formDataToSend.append('id', editingId);
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('category', formData.category);
+
+      // Add new images (up to 5) - only if new files were selected
+      for (let i = 0; i < 5; i++) {
+        if (imageFiles[i]) {
+          formDataToSend.append(`image${i + 1}`, imageFiles[i]);
+        }
+      }
+
+      const userData = getUserData();
+      if (!userData) {
+        throw new Error('User not logged in');
+      }
+
+      // Updated API call - remove the ID from URL since it's now in FormData
+      const response = await fetch('http://localhost/ecom-backend/products/update-product.php', {
+        method: 'POST',
+        headers: {
+          'Authorization': JSON.stringify(userData),
+        },
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update product');
+      }
+
+      const result = await response.json();
+      
+      // Update product in list with the response data
+      setProducts(prev => prev.map(p => {
+        if (p.id == editingId) {
+          return {
+            ...p,
+            title: result.data.title,
+            description: result.data.description,
+            price: result.data.price,
+            category: result.data.category,
+            // Update images with the returned URLs
+            image1: result.data.images[0] || p.image1,
+            image2: result.data.images[1] || p.image2,
+            image3: result.data.images[2] || p.image3,
+            image4: result.data.images[3] || p.image4,
+            image5: result.data.images[4] || p.image5,
+            updated_at: new Date().toISOString()
+          };
+        }
+        return p;
+      }));
+      
+      setMessage({ type: 'success', text: result.message || 'Product updated successfully!' });
+      resetForm();
+
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id) => {
-    setProducts((list) => list.filter((p) => p.id !== id));
-    if (editingId === id) resetForm();
+  const handleDelete = async (id) => {
+    try {
+      setLoading(true);
+      
+      const userData = getUserData();
+      if (!userData) {
+        throw new Error('User not logged in');
+      }
+
+      const response = await fetch(`http://localhost/ecom-backend/products/delete-product.php?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': JSON.stringify(userData),
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to delete product');
+      }
+
+      const result = await response.json();
+      
+      setProducts(prev => prev.filter(p => p.id !== id));
+      setMessage({ type: 'success', text: result.message || 'Product deleted successfully!' });
+      
+      if (editingId === id) {
+        resetForm();
+      }
+      
+      // Close modal
+      setShowDeleteModal(false);
+      setDeleteProductId(null);
+      setDeleteProductTitle('');
+      
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
+      setShowDeleteModal(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openDeleteModal = (product) => {
+    setDeleteProductId(product.id);
+    setDeleteProductTitle(product.title);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteProductId(null);
+    setDeleteProductTitle('');
   };
 
   // ---------- UI ----------
@@ -114,11 +420,40 @@ export default function ProductsManager() {
           📦 Product Management
         </h1>
 
-        {/* Add / Edit Form (always on top) */}
-        <form
-          onSubmit={mode === "add" ? handleAdd : handleUpdate}
-          className="mb-8 rounded-xl border border-gray-200 bg-gray-50/60 shadow-inner"
-        >
+        {/* Message Display */}
+        {message.text && (
+          <div className={`mb-4 p-4 rounded-lg flex justify-between items-center ${
+            message.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 
+            message.type === 'success' ? 'bg-green-100 text-green-700 border border-green-200' :
+            'bg-blue-100 text-blue-700 border border-blue-200'
+          }`}>
+            <span>{message.text}</span>
+            <button 
+              onClick={() => setMessage({ type: '', text: '' })}
+              className="ml-2 text-lg font-bold hover:opacity-70"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {/* Debug Info (remove this in production) */}
+        <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
+          <strong>Debug Info:</strong><br/>
+          Products loaded: {products.length}<br/>
+          Loading: {loading ? 'Yes' : 'No'}<br/>
+          User logged in: {getUserData() ? 'Yes' : 'No'}<br/>
+          <button 
+            onClick={fetchProducts} 
+            className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : 'Retry Fetch'}
+          </button>
+        </div>
+
+        {/* Add / Edit Form */}
+        <div className="mb-8 rounded-xl border border-gray-200 bg-gray-50/60 shadow-inner">
           <div className="flex items-center justify-between px-5 py-4 border-b">
             <h2 className="text-lg font-semibold">
               {mode === "add" ? "Add Product" : `Edit Product #${editingId}`}
@@ -127,25 +462,28 @@ export default function ProductsManager() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+                disabled={loading}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className={`px-5 py-2 rounded-lg text-white transition ${
+                onClick={mode === "add" ? handleAdd : handleUpdate}
+                disabled={loading}
+                className={`px-5 py-2 rounded-lg text-white transition disabled:opacity-50 ${
                   mode === "add"
                     ? "bg-green-600 hover:bg-green-700"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
-                {mode === "add" ? "Save Product" : "Update Product"}
+                {loading ? 'Processing...' : (mode === "add" ? "Save Product" : "Update Product")}
               </button>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 p-5">
-            {/* Upload (screenshot style) */}
+            {/* Upload */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Image of Product
@@ -153,14 +491,13 @@ export default function ProductsManager() {
 
               <div
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition
-                ${images.length ? "border-blue-300" : "border-gray-300 hover:border-blue-400"}`}
+                ${imagePreviews.length ? "border-blue-300" : "border-gray-300 hover:border-blue-400"}`}
                 onClick={() => document.getElementById("fileInputMain").click()}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
               >
-                {images.length === 0 ? (
+                {imagePreviews.length === 0 ? (
                   <>
-                    {/* icon + text, matches provided screenshot vibe */}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -184,7 +521,7 @@ export default function ProductsManager() {
                   </>
                 ) : (
                   <div className="flex flex-wrap gap-3 justify-center">
-                    {images.map((src, i) => (
+                    {imagePreviews.map((src, i) => (
                       <div
                         key={i}
                         className="relative group w-24 h-24 rounded-lg overflow-hidden border"
@@ -206,7 +543,7 @@ export default function ProductsManager() {
                         </button>
                       </div>
                     ))}
-                    {images.length < 5 && (
+                    {imagePreviews.length < 5 && (
                       <button
                         type="button"
                         onClick={() =>
@@ -237,7 +574,7 @@ export default function ProductsManager() {
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Title
+                Title *
               </label>
               <input
                 name="title"
@@ -249,21 +586,43 @@ export default function ProductsManager() {
               />
             </div>
 
-            {/* % Off */}
+            {/* Price */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                % Off
+                Price *
               </label>
               <input
                 type="number"
-                name="discount"
-                value={formData.discount}
+                name="price"
+                value={formData.price}
                 onChange={handleChange}
                 className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-400 outline-none"
-                placeholder="e.g., 15"
+                placeholder="e.g., 999"
+                step="0.01"
                 min="0"
-                max="100"
+                required
               />
+            </div>
+
+            {/* Category Dropdown */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category *
+              </label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-400 outline-none bg-white"
+                required
+              >
+                <option value="">Select a category</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Description */}
@@ -280,41 +639,15 @@ export default function ProductsManager() {
                 placeholder="Write product details…"
               />
             </div>
-
-            {/* Rating */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Rating
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="5"
-                name="rating"
-                value={formData.rating}
-                onChange={handleChange}
-                className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-400 outline-none"
-                placeholder="0–5"
-              />
-            </div>
-
-            {/* Review */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Review
-              </label>
-              <textarea
-                name="review"
-                value={formData.review}
-                onChange={handleChange}
-                rows="2"
-                className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-400 outline-none"
-                placeholder="One-line customer review"
-              />
-            </div>
           </div>
-        </form>
+        </div>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-4">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        )}
 
         {/* Table */}
         <div className="overflow-x-auto">
@@ -324,9 +657,9 @@ export default function ProductsManager() {
                 <th className="p-3 text-left">ID</th>
                 <th className="p-3 text-left">Images</th>
                 <th className="p-3 text-left">Title</th>
-                <th className="p-3 text-left">% Off</th>
-                <th className="p-3 text-left">Rating</th>
-                <th className="p-3 text-left">Review</th>
+                <th className="p-3 text-left">Price</th>
+                <th className="p-3 text-left">Category</th>
+                <th className="p-3 text-left">Description</th>
                 <th className="p-3 text-left">Actions</th>
               </tr>
             </thead>
@@ -349,10 +682,10 @@ export default function ProductsManager() {
                     <td className="p-3 align-top">{p.id}</td>
                     <td className="p-3 align-top">
                       <div className="flex gap-2 flex-wrap">
-                        {p.images?.map((img, i) => (
+                        {[1,2,3,4,5].map(i => p[`image${i}`] && (
                           <img
                             key={i}
-                            src={img}
+                            src={p[`image${i}`]}
                             alt=""
                             className="w-12 h-12 rounded object-cover border"
                           />
@@ -361,25 +694,33 @@ export default function ProductsManager() {
                     </td>
                     <td className="p-3 align-top">{p.title}</td>
                     <td className="p-3 align-top">
-                      {p.discount ? `${p.discount}%` : "-"}
+                      {p.price ? `₹${p.price}` : "-"}
                     </td>
                     <td className="p-3 align-top">
-                      {p.rating ? p.rating : "-"}
+                      {p.category ? (
+                        <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                          {p.category}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
                     </td>
-                    <td className="p-3 align-top">
-                      <span className="line-clamp-2">{p.review || "-"}</span>
+                    <td className="p-3 align-top max-w-xs">
+                      <span className="line-clamp-2 text-sm">{p.description || "-"}</span>
                     </td>
                     <td className="p-3 align-top">
                       <div className="flex gap-2">
                         <button
                           onClick={() => startEdit(p)}
-                          className="px-3 py-1 rounded bg-yellow-500 text-white hover:bg-yellow-600"
+                          disabled={loading}
+                          className="px-3 py-1 rounded bg-yellow-500 text-white hover:bg-yellow-600 disabled:opacity-50"
                         >
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDelete(p.id)}
-                          className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600"
+                          onClick={() => openDeleteModal(p)}
+                          disabled={loading}
+                          className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
                         >
                           Delete
                         </button>
@@ -391,6 +732,46 @@ export default function ProductsManager() {
             </tbody>
           </table>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0  bg-opacity-0 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform border-2 border-gray-200">
+              <div className="p-6">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-full mb-4">
+                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                </div>
+                
+                <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                  Delete Product
+                </h3>
+                
+                <p className="text-gray-600 text-center mb-6">
+                  Are you sure you want to delete "<span className="font-semibold text-gray-800">{deleteProductTitle}</span>"? This action cannot be undone.
+                </p>
+                
+                <div className="flex space-x-4">
+                  <button
+                    onClick={closeDeleteModal}
+                    disabled={loading}
+                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition disabled:opacity-50 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleDelete(deleteProductId)}
+                    disabled={loading}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 font-medium"
+                  >
+                    {loading ? 'Deleting...' : 'Delete'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
