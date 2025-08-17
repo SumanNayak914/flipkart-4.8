@@ -1,15 +1,6 @@
 import React from "react";
 import { Star, Truck, BadgePercent, ChevronRight, ShieldCheck, Heart, Bell, Grid } from "lucide-react";
 
-/*
-  Flipkart-Style Catalog Page - Improved Version
-  --------------------------------------------------
-  - Mobile-first UI with enhanced styling
-  - Smooth horizontal slider for Recently Viewed
-  - Better card designs with hover effects
-  - Two-column product grid for Explore section
-  - Bottom navigation bar
-*/
 
 const currency = (n) => `₹${n.toLocaleString("en-IN")}`;
 

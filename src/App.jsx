@@ -12,25 +12,10 @@ import UserLogin from "./pages/UserLogin.jsx";
 import UserRegister from "./pages/UserRegister.jsx";
 import { ToastContainer } from "react-toastify";
 import FlipkartProductPage from "./component/product/FlipkartProductPage.jsx";
+import ProtectedRoute from "./component/ProtectedRoute.jsx";
 
 const App = () => {
   const loc = useLocation();
-
-  // let jsonString = localStorage.getItem("user");
-  // let user = JSON.parse(jsonString);
-
-  // const navigate = useNavigate();
-
-  // console.log(user );
-
-  // if (user?.email == "sumankumarnayak802@gmail.com")
-  // {
-  //   navigate('/admin')
-  // } 
-  // if (user.email == null)
-  // {
-  //   navigate('/')
-  // } 
     return (
       <>
         {loc.pathname == "/" && <Header />}
@@ -40,13 +25,30 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/" element={<Home />} />
           <Route path="/account" element={<Account />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route 
+  path="/admin" 
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <Admin />
+    </ProtectedRoute>
+  } 
+/>
           <Route path="/userLogin" element={<UserLogin />} />
           <Route path="/userRegister" element={<UserRegister />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <ToastContainer position="bottom-right" theme="dark" />
-        {!loc.pathname == "/product" && <Footer /> }
+        <ToastContainer  position="top-center"  
+        autoClose={1000}        
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark" />
+        {["/", "/account", "/categories", "/cart"].includes(loc.pathname) && <Footer />}
+
         
       </>
     );

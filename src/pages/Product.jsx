@@ -28,7 +28,7 @@ const Product = () => {
   <Nav product={product}/>
   <FlipkartProductPage  product={product}/>
    <FlipStyleCatalog  product={product}/>
-    <BottomNavBar />
+    <BottomNavBar product={product} />
    
    </>
   )

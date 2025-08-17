@@ -55,7 +55,7 @@ const ProductPage = ({product}) => {
                     <img
                       src={image}
                       alt={`${product.title} ${index + 1}`}
-                      className="w-full h-full object-cover select-none"
+                      className="w-full h-full object-contain select-none"
                       draggable={false}
                     />
                   </div>
